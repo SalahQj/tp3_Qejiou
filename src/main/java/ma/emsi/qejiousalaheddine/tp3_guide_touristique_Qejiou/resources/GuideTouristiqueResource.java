@@ -12,28 +12,41 @@ import jakarta.ws.rs.core.Response;
 import ma.emsi.qejiousalaheddine.tp3_guide_touristique_Qejiou.llm.LlmClient;
 import ma.emsi.qejiousalaheddine.tp3_guide_touristique_Qejiou.llm.InfosTouristiques;
 
-@Path("/guide") // URL: /api/guide
-@RequestScoped // Un nouveau bean pour chaque requête HTTP
+// ▼▼▼ 4. AJOUT DES IMPORTS POUR LE BONUS ▼▼▼
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.DefaultValue;
+
+@Path("/guide")
+@RequestScoped
 public class GuideTouristiqueResource {
 
     @Inject
-    private LlmClient llmClient; // Injection du client LangChain4j
+    private LlmClient llmClient;
 
     @GET
-    @Path("/lieu/{ville_ou_pays}") // URL: /api/guide/lieu/Paris
-    @Produces(MediaType.APPLICATION_JSON) // Dit à JAX-RS de convertir la réponse en JSON
-    public Response guideVilleOuPays(@PathParam("ville_ou_pays") String villeOuPays) {
+    @Path("/lieu/{ville_ou_pays}")
+    @Produces(MediaType.APPLICATION_JSON)
+    // ▼▼▼ 5. MODIFICATION DE LA MÉTHODE ▼▼▼
+    public Response guideVilleOuPays(
+            @PathParam("ville_ou_pays") String villeOuPays,
+            @QueryParam("nb") @DefaultValue("2") int nb) { // <-- Ajout du QueryParam "nb", avec 2 comme défaut
 
         try {
-            // 1. Appeler le LLM
-            InfosTouristiques reponse = llmClient.getInfos(villeOuPays);
+            // 6. Appeler le LLM avec le nombre d'endroits
+            InfosTouristiques reponse = llmClient.getInfos(villeOuPays, nb);
 
-            // 2. Retourner la réponse
-            // JAX-RS va automatiquement convertir l'objet 'reponse' en JSON
-            return Response.ok(reponse).build();
+            // 7. Construire la réponse
+            Response.ResponseBuilder responseBuilder = Response.ok(reponse);
+
+            // 8. AJOUT DES EN-TÊTES (Bonus optionnel HTML/CORS)
+            responseBuilder.header("Access-Control-Allow-Origin", "*");
+            responseBuilder.header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+            responseBuilder.header("Pragma", "no-cache");
+            responseBuilder.header("Expires", "0");
+
+            return responseBuilder.build();
 
         } catch (Exception e) {
-            // 3. Gérer les erreurs (ex: clé API)
             return Response.serverError()
                     .entity("Erreur interne du serveur: " + e.getMessage())
                     .build();

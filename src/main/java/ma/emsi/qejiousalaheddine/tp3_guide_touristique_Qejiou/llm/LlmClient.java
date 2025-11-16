@@ -24,14 +24,14 @@ public class LlmClient implements Serializable {
                 .logResponses(true)
                 .build();
 
-        // Pas de mémoire nécessaire, chaque requête est indépendante
         this.assistant = AiServices.builder(GuideTouristiqueAssistant.class)
                 .chatModel(model)
                 .build();
     }
 
     // C'est la méthode que notre API REST va appeler
-    public InfosTouristiques getInfos(String lieu) {
-        return this.assistant.chat(lieu);
+    // ▼▼▼ MODIFICATION ICI ▼▼▼
+    public InfosTouristiques getInfos(String lieu, int nb) { // <-- 2. Ajout de 'nb'
+        return this.assistant.chat(lieu, nb); // <-- 3. Passer 'nb' à l'assistant
     }
 }

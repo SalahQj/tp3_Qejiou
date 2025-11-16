@@ -12,9 +12,13 @@ public interface GuideTouristiqueAssistant {
         N'ajoute AUCUN texte avant ou après le JSON, et n'utilise PAS de Markdown.
         Le JSON doit avoir exactement 3 clés :
         1. 'ville_ou_pays' (le nom du lieu demandé)
-        2. 'endroits_a_visiter' (une liste de 2 noms de lieux)
+        2. 'endroits_a_visiter' (une liste de noms de lieux)
         3. 'prix_moyen_repas' (une chaîne de caractères avec le prix ET la devise, ex: "20 EUR")
         """)
-    @UserMessage("Donne-moi les informations touristiques pour {{lieu}}")
-    InfosTouristiques chat(@V("lieu") String lieu); // Retourne directement le record
+    // ▼▼▼ MODIFICATION ICI ▼▼▼
+    @UserMessage("""
+        Donne-moi les informations touristiques pour {{lieu}}.
+        La liste 'endroits_a_visiter' doit contenir exactement {{nb}} endroits principaux.
+        """)
+    InfosTouristiques chat(@V("lieu") String lieu, @V("nb") int nb); // <-- 1. Ajout de 'nb'
 }
